@@ -47,6 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 	username = models.CharField(max_length=255, unique=True)
 	email = models.EmailField(unique=True)
 	password = models.CharField(max_length=128)
+	profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 	code = models.CharField(max_length=10, default=None, null=True)
 	is_verified = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=True)

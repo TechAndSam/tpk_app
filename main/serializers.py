@@ -1,8 +1,13 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework.exceptions import ValidationError
+
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 from .models import User, UniqueRegistrationCode, UserType
 
 
@@ -103,3 +108,59 @@ class LoginSerializer(serializers.Serializer):
 		else:
 			raise serializers.ValidationError({'username': 'Username and password are required!'})
 
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'profile_picture']
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.profile_picture = validated_data.get('profile_picture', instance.profile_picture)
+        password = validated_data.get('password')
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'user_type', 'profile_picture', 'is_active', 'is_staff')
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise ValidationError("No account with this email address exists.")
+        return value
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    token = serializers.CharField()
+    password = serializers.CharField(min_length=6)
+
+    def validate(self, attrs):
+        email = attrs['email']
+        token = attrs['token']
+        password = attrs['password']
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            raise ValidationError("Invalid email address.")
+
+        if not default_token_generator.check_token(user, token):
+            raise ValidationError("Invalid or expired token.")
+
+        attrs['user'] = user
+        return attrs
