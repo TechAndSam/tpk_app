@@ -7,6 +7,7 @@ from django.utils.encoding import force_bytes, force_str
 from .models import User
 from .serializers import UserRegistrationSerializer, LoginSerializer, \
 PasswordResetRequestSerializer, PasswordResetConfirmSerializer, UserProfileUpdateSerializer, UserSerializer
+from .custom_permissions import IsAdminUserType
 
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
@@ -41,14 +42,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         # Obtain the access token
         user_data = serializer.validated_data.get('user')
-        print(f"user_data in views is now {user_data}")
+        #print(f"user_data in views is now {user_data}")
 
         if user_data:
             user = get_user_model().objects.get(id=user_data['id'])
             refresh = RefreshToken.for_user(user)
-            print('#####Refresh token obtained in views here!######')
+            print(f'#####Refresh token obtained for {user.user_type} user in views here!######')
             refresh_token = str(refresh)
-            print('Generated Refresh Token from views:', refresh_token)
+            #print('Generated Refresh Token from views:', refresh_token)
             access_token = str(refresh.access_token)
             print('Generated Access Token from views:', access_token)
             # Include the access token in the response data
@@ -69,7 +70,7 @@ class UserProfileUpdateView(generics.UpdateAPIView):
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminUserType,)
 
 
 # class LogoutView(APIView):
