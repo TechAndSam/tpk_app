@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-l1w+(b6@r_ls7byko#7+w=peb(hohn+@+a!j6+5@%_t)y!h0jn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'tpkapp-production.up.railway.app', '*']
+ALLOWED_HOSTS = ['tpkapp-production.up.railway.app','localhost', '*']
 
 
 # Application definition
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'quiz',
     'rest_framework',
     'drf_yasg',
-    'corsheaders',
+    'corsheaders'
 ]
 
 
@@ -75,8 +75,8 @@ JWT_ACCESS_TOKEN_EXPIRATION = timedelta(minutes=1)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
