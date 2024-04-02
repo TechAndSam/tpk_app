@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-l1w+(b6@r_ls7byko#7+w=peb(hohn+@+a!j6+5@%_t)y!h0jn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'tpkapp-production.up.railway.app']
+ALLOWED_HOSTS = ['localhost', 'tpkapp-production.up.railway.app', '*']
 
 
 # Application definition
@@ -49,6 +49,13 @@ INSTALLED_APPS = [
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+CORS_ALLOWED_ORIGINS = [
+    'https://tpkapp-production.up.railway.app',
+
+    'http://localhost:3000',  
+]
 
 # Email config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
