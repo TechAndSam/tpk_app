@@ -44,8 +44,11 @@ INSTALLED_APPS = [
     'quiz',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
 ]
 
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Email config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
