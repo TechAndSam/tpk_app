@@ -70,7 +70,7 @@ class UserProfileUpdateView(generics.UpdateAPIView):
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdminUserType,)
+    #permission_classes = (IsAdminUserType,)
 
 
 # class LogoutView(APIView):
