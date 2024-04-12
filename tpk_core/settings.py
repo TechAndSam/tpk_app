@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -67,6 +68,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your_email@gmail.com'  # Your Gmail address
 EMAIL_HOST_PASSWORD = 'your_password'     # Your Gmail password
 
+#FRONTEND_URL = 'https://tpkapp-production.up.railway.app'
+FRONTEND_URL = 'localhost:8000'
 
 # access token expiry simulation
 JWT_ACCESS_TOKEN_EXPIRATION = timedelta(minutes=1)
@@ -89,7 +92,13 @@ ROOT_URLCONF = 'tpk_core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'main/templates'],
+        # 'DIRS': [
+        #     # Add the templates directory within your app
+        #     os.path.join(BASE_DIR, 'tpk_core', 'templates'),
+        #     # Add any additional template directories if needed
+        # ],
+        #'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -125,6 +134,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        #'rest_framework.authentication.TokenAuthentication',
     )
 }
 

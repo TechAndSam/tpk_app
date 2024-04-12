@@ -11,6 +11,8 @@ from django.utils.encoding import force_bytes, force_str
 from .models import User, UniqueRegistrationCode, UserType
 
 
+
+# serializers
 class UserTypeSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = UserType 
@@ -23,7 +25,7 @@ class UniqueRegistrationCodeSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
+class User1RegistrationSerializer(serializers.ModelSerializer):
 	password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 	password2 = serializers.CharField(write_only=True, required=True)
 	code = serializers.CharField(required=True)
@@ -68,6 +70,40 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 		return user
 
 
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+    code = serializers.CharField(required=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'email', 'code', 'password', 'password2')
+
+    def validate_code(self, value):
+        # Check if code is available
+        registration_code = UniqueRegistrationCode.objects.filter(code=value).first()
+        if not registration_code or registration_code.status != 'AVAILABLE':
+            raise serializers.ValidationError('Invalid or used registration code!')
+        return value
+
+    def save(self, **kwargs):
+        validated_data = dict(self.validated_data)
+        code = validated_data.pop('code')
+        validated_data.pop('password2', None)
+        
+        # Create the user instance without 'code'
+        user = get_user_model().objects.create(**validated_data)
+        user.set_unusable_password()
+        user.save()
+
+        # Mark the code as used
+        registration_code = UniqueRegistrationCode.objects.get(code=code)
+        registration_code.status = 'USED'
+        registration_code.save()
+
+        return user
+
+
 class LoginSerializer(serializers.Serializer):
 	username = serializers.CharField(max_length=255)
 	password = serializers.CharField(max_length=128, write_only=True)
@@ -108,6 +144,11 @@ class LoginSerializer(serializers.Serializer):
 		else:
 			raise serializers.ValidationError({'username': 'Username and password are required!'})
 
+
+class UniqueRegistrationCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UniqueRegistrationCode
+        fields = ['code', 'status']
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
