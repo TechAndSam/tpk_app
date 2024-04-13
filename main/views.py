@@ -29,47 +29,50 @@ from rest_framework import status
 
 
 # Create your views here.
-class User1Create(generics.CreateAPIView):
+class UserCreate(generics.CreateAPIView):
     authentication_classes = ()
     permission_classes = ()
     serializer_class = UserRegistrationSerializer
 
-    # def perform_create(self, serializer):
-    #     user = serializer.save()
-    #     refresh = RefreshToken.for_user(user)
-
     def perform_create(self, serializer):
         user = serializer.save()
+        refresh = RefreshToken.for_user(user)
 
-        # Generate activation token
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
+        return Response({"message": "Account created successfully! You can login now!."}, status=status.HTTP_201_CREATED)
 
-        # Construct activation link
-        activation_link = f"{settings.FRONTEND_URL}/activate/{uid}/{token}/"
+    # def perform_create(self, serializer):
+    #     user = serializer.save()
 
-        # Render email template
-        email_subject = "Activate Your Account"
-        email_message = render_to_string('email/activation_email.html', {'activation_link': activation_link})
+    #     # Generate activation token
+    #     uid = urlsafe_base64_encode(force_bytes(user.pk))
+    #     token = default_token_generator.make_token(user)
 
-        # Send activation email
-        send_mail(
-            email_subject,
-            email_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
-        )
+    #     # Construct activation link
+    #     activation_link = f"{settings.FRONTEND_URL}/activate/{uid}/{token}/"
+
+    #     # Render email template
+    #     email_subject = "Activate Your Account"
+    #     email_message = render_to_string('email/activation_email.html', {'activation_link': activation_link})
+
+    #     # Send activation email
+    #     send_mail(
+    #         email_subject,
+    #         email_message,
+    #         settings.DEFAULT_FROM_EMAIL,
+    #         [user.email],
+    #         fail_silently=False,
+    #     )
 
         # Optionally, you can also generate JWT tokens for immediate login after registration
         refresh = RefreshToken.for_user(user)
 
-        return Response({"message": "Account created. Please check your email for activation instructions."}, status=status.HTTP_201_CREATED)
+        #return Response({"message": "Account created. Please check your email for activation instructions."}, status=status.HTTP_201_CREATED)
+        
 
 
 
 @api_view(['POST'])
-def UserCreate(request):
+def User1Create(request):
     serializer = UserRegistrationSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()

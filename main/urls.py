@@ -5,10 +5,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 urlpatterns = [
-    #path('register/', UserCreate.as_view(), name='register'),
-    path('register/', UserCreate, name='user_register'),
+    path('register/', UserCreate.as_view(), name='register'),
+    #path('register/', UserCreate, name='user_register'),
     path('activate/<uidb64>/<token>/', activate_user, name='user_activate'),
-    path('login/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('profile/update/<user_id>/', UserProfileUpdateView.as_view(), name='profile-update'),
     path('codes/', UniqueRegistrationCodeListView.as_view(), name='unique_registration_codes'),
     path('users/', UserListView.as_view(), name='user-list'),
